@@ -1,0 +1,20 @@
+{
+  "name": "thinkncollab-cli",
+  "author": "Raman Singh",
+  "version": "0.0.77",
+  "description": "CLI tool for ThinkNCollab",
+  "main": "index.js",
+  "bin": {
+    "tnc-cli": "./bin/index.js"
+  },
+  "scripts": {
+    "start": "node bin/index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "chalk": "^5.6.2",
+    "inquirer": "^9.3.8",
+    "node-machine-id": "^1.1.12"
+  }
+}
