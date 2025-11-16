@@ -202,7 +202,7 @@ function checkChanges(fileTree, versionMap, rootPath = CWD) {
         }
       }
     } catch (err) {
-      console.error(`❌ Error checking changes for ${relativePath}:`, err.message);
+      console.error(` Error checking changes for ${relativePath}:`, err.message);
     }
 
     const newItem = {
@@ -256,7 +256,7 @@ async function uploadTree(fileTree, folderHex, roomId, token, email, previousVer
   const uploaded = [];
 
   for (const node of fileTree) {
-    // ✅ FIXED: Correct path construction without duplication
+    //  FIXED: Correct path construction without duplication
     let relativePath;
     if (parentPath) {
       relativePath = path.join(parentPath, node.name).replace(/\\/g, "/");
@@ -278,9 +278,9 @@ async function uploadTree(fileTree, folderHex, roomId, token, email, previousVer
 
       if (node.changed) {
         try {
-          console.log(`📤 Uploading changed file: ${relativePath}`);
+          console.log(` Uploading changed file: ${relativePath}`);
           const url = await uploadFileSigned(path.join(CWD, node.path), `tnc_uploads/${folderHex}`, roomId, token, email);
-          console.log(`✅ Uploaded: ${relativePath}`);
+          console.log(` Uploaded: ${relativePath}`);
 
           uploaded.push({
             ...node,
@@ -290,7 +290,7 @@ async function uploadTree(fileTree, folderHex, roomId, token, email, previousVer
             version: prevFile ? prevFile.version + 1 : 1
           });
         } catch (err) {
-          console.error(`❌ Failed to upload ${relativePath}:`, err.message);
+          console.error(` Failed to upload ${relativePath}:`, err.message);
           // Fallback to previous version if upload fails
           uploaded.push({
             ...node,
@@ -302,7 +302,7 @@ async function uploadTree(fileTree, folderHex, roomId, token, email, previousVer
         }
       } else {
         // Unchanged file - use previous URL and version
-        console.log(`📋 Using previous version for: ${relativePath}`);
+        console.log(` Using previous version for: ${relativePath}`);
         uploaded.push({
           ...node,
           url: prevFile?.url,
@@ -318,30 +318,27 @@ async function uploadTree(fileTree, folderHex, roomId, token, email, previousVer
 }
 
 /** ------------------ PUSH FUNCTION ------------------ **/
+// Push will be perform in that branch in which the user is currently
 async function push(roomId, targetPath) {
   const { token, email } = readToken();
   const tncMetaPath = path.join(process.cwd(), ".tnc", ".tncmeta.json");
   if (!fs.existsSync(tncMetaPath)) {
-    console.error("❌ Project not initialized. Run 'tnc init' first.");
+    console.error(" Project not initialized. Run 'tnc init' first.");
     process.exit(1);
   }
   const meta = JSON.parse(fs.readFileSync(tncMetaPath, "utf-8"));
   const projectId = meta.projectId;
-
-
-   const tncPushInfo = path.join(process.cwd(), ".tnc", ".tncpush.json");
+  const branch = meta.branch;
+  const branchId = meta.branchId;
+  const tncPushInfo = path.join(process.cwd(), ".tnc", ".tncpush.json");
   if (!fs.existsSync(tncMetaPath)) {
-    console.error("❌ Project not initialized. Run 'tnc init' first.");
+    console.error(" Project not initialized. Run 'tnc init' first.");
     process.exit(1);
   }
   const lastFolderId = JSON.parse(fs.readFileSync(tncPushInfo, "utf-8")).folderId;
-
-  
-
   const stats = fs.statSync(targetPath);
   const rootFolder = stats.isDirectory() ? targetPath : path.dirname(targetPath);
   const ignoreList = loadIgnore(rootFolder);
-
   let content;
   if (stats.isDirectory()) {
     content = scanFolder(targetPath, ignoreList);
@@ -351,14 +348,12 @@ async function push(roomId, targetPath) {
       ? []
       : [{ name: relativePath, type: "file", path: relativePath, size: stats.size }];
   }
-
   if (!content.length) {
-    console.log("⚠️ Nothing to upload (all ignored).");
+    console.log(" Nothing to upload (all ignored).");
     return;
   }
-
   const previousVersions = loadVersions();
-  console.log('📁 Previous versions:', Object.keys(previousVersions).length);
+  console.log(' Previous versions:', Object.keys(previousVersions).length);
 
   const contentWithChanges = checkChanges(content, previousVersions);
 
@@ -366,30 +361,26 @@ async function push(roomId, targetPath) {
   const changedFiles = contentWithChanges.flatMap(item =>
     item.changed ? [item.path] : []
   );
-  console.log('🔄 Changed files:', changedFiles.length, changedFiles);
+  console.log('Changed files:', changedFiles.length, changedFiles);
 
   const hasChanges = contentWithChanges.some(item => item.changed || (item.children && item.children.some(c => c.changed)));
 
   if (!hasChanges) {
-    console.log("ℹ️ No changes detected since last push.");
+    console.log(" No changes detected since last push.");
     return;
   }
 
   try {
     const folderHex = crypto.createHash("md5").update(path.basename(targetPath) + Date.now()).digest("hex");
-
-    console.log("🚀 Uploading to Cloudinary...");
+    console.log(" Uploading to Cloudinary...");
     const uploadedTree = await uploadTree(contentWithChanges, folderHex, roomId, token, email, previousVersions);
-
-    console.log("🗂️ Sending metadata...");
+    console.log(" Sending metadata...");
      const res = await axios.post(
       `${BASE_URL}/${roomId}/upload`,
-      { folderId: folderHex, content: uploadedTree, uploadedBy: email, projectId, latestFolderId: lastFolderId},
+      { folderId: folderHex, content: uploadedTree, uploadedBy: email, projectId, latestFolderId: lastFolderId, branch: branch, branchId: branchId},
       { headers: { authorization: `Bearer ${token}`, email } }
     );
-
-    console.log("✅ Upload complete! Metadata stored successfully.");
-
+    console.log(" Upload complete! Metadata stored successfully.");
     // Save version hashes WITH URLs
     const newVersionMap = {};
     const flattenAndStore = (items) => {
@@ -397,7 +388,7 @@ async function push(roomId, targetPath) {
         if (item.type === "file") {
           newVersionMap[item.path] = {
             hash: item.hash,
-            url: item.url, // ✅ Store URL locally
+            url: item.url, // Store URL locally
             version: item.version || 1
           };
         }
@@ -406,18 +397,18 @@ async function push(roomId, targetPath) {
     };
     flattenAndStore(uploadedTree);
     saveVersions(newVersionMap);
-
     // Determine latest version number from uploaded files
     const versionNumbers = Object.values(newVersionMap).map(f => f.version || 1);
     const latestVersion = versionNumbers.length > 0 ? Math.max(...versionNumbers) : 1;
-
     const newPushRecord = {
         version: latestVersion,
         pushedAt: new Date().toISOString(),
         roomId: roomId,
         pushedBy: email,
         projectId: projectId,
-        folderId: res.data.folderId
+        folderId: res.data.folderId,
+        branch: res.data.branch,
+        branchId: res.data.branchId
     };
 
 
@@ -428,10 +419,10 @@ async function push(roomId, targetPath) {
       JSON.stringify(newPushRecord, null, 2)
     );
 
-    console.log(`💾 Saved ${Object.keys(newVersionMap).length} files to .tncversions`);
+    console.log(` Saved ${Object.keys(newVersionMap).length} files to .tncversions`);
 
   } catch (err) {
-    console.error("❌ Upload failed:", err.response?.data || err.message);
+    console.error(" Upload failed:", err.response?.data || err.message);
   }
 }
 
@@ -455,7 +446,7 @@ async function main() {
         process.exit(1);
       }
       const roomId = args[roomIndex + 1];
-      const targetPath = args[roomIndex + 3];
+      const targetPath = args[roomIndex + 2];
       await push(roomId, targetPath);
       break;
     }
