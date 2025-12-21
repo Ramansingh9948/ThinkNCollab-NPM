@@ -1,2 +1,5 @@
 "should require branchId and contain the information of branch in which we are pushing"
 Check why folder's file always show changes even if there is no changes.
+
+In push.js (line-114) -->> the dolder either have directory or file it takes all of them
+..before creating hash just check weather it is Dir ot file if it is file then just go for the hash fir the content.

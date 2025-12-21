@@ -4,7 +4,7 @@ import axios from "axios";
 import os from "os";
 
 const homeDir = os.homedir();
-const url = "https://thinkncollab.in/cli/mytasks"; // backend endpoint
+const url = "http://localhost:3001/cli/mytasks"; // backend endpoint
 
 // Get saved email from ~/.tncrc
 async function getEmail() {
@@ -32,10 +32,14 @@ async function getToken() {
 }
 
 // Fetch tasks for a given room
-async function myTask(roomId) {
+async function myTask() {
   try {
     const email = await getEmail();
     const token = await getToken();
+    const CWD = process.cwd();
+    const metaDataPath = path.join(".tnc", '.tncmeta.json'); // assuming room ID is the current directory name
+    const metaData = JSON.parse(fs.readFileSync(path.join(CWD, metaDataPath), 'utf-8'));
+    const roomId = metaData.roomId;
 
     const res = await axios.get(`${url}/${roomId}`, {
       params: { email, token } // since backend uses req.query
