@@ -4,7 +4,7 @@ import axios from "axios";
 import os from "os";
 
 const homeDir = os.homedir();
-const url = "http://localhost:3001/cli/mytasks"; // backend endpoint
+const url = "https://thinkncollab.com/cli/mytasks"; // backend endpoint
 
 // Get saved email from ~/.tncrc
 async function getEmail() {

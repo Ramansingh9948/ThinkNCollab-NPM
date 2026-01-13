@@ -11,15 +11,19 @@ async function connect(roomId) {
     console.error("❌ You are not logged in. Run 'tnc login' first.");
     process.exit(1);
   }
+   const answer = await inquirer.prompt([
+      { type: "input", name: "projectName", message: "Enter Branch Name to create a branch:" }
+    ]);
 
   const data = fs.readFileSync(tncrcPath, "utf-8");
   const { email, token } = JSON.parse(data);
 
   try {
-    const response = await axios.post(`http://localhost:3001/cli/connect/${roomId}`, {
+    const response = await axios.post(`https://thinkncollab.com/cli/connect/${roomId}`, {
       email: email,
       token: token,
-      machineId: await machine.machineIdSync()
+      machineId: await machine.machineIdSync(),
+      branchName: answer.projectName,
     });
     const CWD= process.cwd();
     const tncFolderPath = path.join(CWD, ".tnc");
@@ -52,9 +56,9 @@ console.log(response.data);
 
   } catch (err) {
     if (err.response) {
-      console.error("❌ Error:", err.response.data.error);
+      console.error(" Error:", err.response.data.error);
     } else {
-      console.error("❌ Error:", err.message);
+      console.error(" Error:", err.message);
     }
   }
 }

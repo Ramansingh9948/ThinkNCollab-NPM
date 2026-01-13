@@ -25,7 +25,7 @@ async function projectInit(roomId) {
   const userToken = JSON.parse(data).token;
 
   // Initialize project via backend
-  const response = await axios.post("http://localhost:3001/cli/init", {
+  const response = await axios.post("https://thinkncollab.com/cli/init", {
     projectName: answer.projectName,
     owner: currentUser,
     token: userToken,

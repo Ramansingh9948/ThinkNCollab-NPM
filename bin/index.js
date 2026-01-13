@@ -120,6 +120,11 @@ async function main() {
 
   case "connect": {
     const idx = args.indexOf("connect");
+    if(idx === -1 || !args[idx+1]){
+      console.log(" Usage: tnc-cli connect <roomId> ");
+      process.exit(1);
+    }
+
     const link = args[idx+1];
     await connect(link);
     break;
@@ -169,7 +174,11 @@ case "my-tasks": {
 }
 case "invite": {
   const roomIdx = args.indexOf("invite");
-  const email = args[roomIdx + 1]; 
+  if (roomIdx === -1 || !args[roomIdx + 1]) {
+    console.log("Usage: tnc-cli invite <invitee-email>");
+    process.exit(1);
+  }
+  const email = args[roomIdx + 1];
 
   await sendInvite(email); 
   break;
