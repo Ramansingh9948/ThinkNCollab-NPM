@@ -1,7 +1,7 @@
 {
   "name": "thinkncollab-cli",
   "author": "Raman Singh",
-  "version": "0.0.77",
+  "version": "0.0.85",
   "description": "CLI tool for ThinkNCollab",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,11 @@
   "dependencies": {
     "axios": "^1.12.2",
     "chalk": "^5.6.2",
-    "inquirer": "^9.3.8",
-    "node-machine-id": "^1.1.12"
+    "cli-table3": "^0.6.5",
+    "form-data": "^4.0.5",
+    "inquirer": "^8.2.5",
+    "inquirer-file-selector": "^1.0.1",
+    "node-machine-id": "^1.1.12",
+    "open": "^11.0.0"
   }
 }

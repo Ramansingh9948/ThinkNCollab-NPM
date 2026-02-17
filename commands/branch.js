@@ -75,7 +75,7 @@ if (!email || !token) {
 console.log(email, token);
 
 
-    const res = await axios.post("http://localhost:3001/cli/createBranch", {
+    const res = await axios.post("https://thinkncollab.com/cli/createBranch", {
       branchName: branchName.trim(),
       roomId : roomId,
       email: email,

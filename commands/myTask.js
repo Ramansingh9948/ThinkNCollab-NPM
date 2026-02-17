@@ -2,63 +2,138 @@ import fs from "fs";
 import path from "path";
 import axios from "axios";
 import os from "os";
+import machine from "node-machine-id";
+import CliTable3 from "cli-table3";
+import chalk from "chalk";
 
 const homeDir = os.homedir();
-const url = "https://thinkncollab.com/cli/mytasks"; // backend endpoint
+const url = "https://thinkncollab.com/cli/mytasks";
 
-// Get saved email from ~/.tncrc
-async function getEmail() {
+// -----------------------------
+// Read ~/.tncrc
+// -----------------------------
+function getAuthData() {
   const rcFile = path.join(homeDir, ".tncrc");
 
   if (!fs.existsSync(rcFile)) {
-    console.log("⚠️ Please login first!");
+    console.log(chalk.red("⚠️ Please login first!"));
     process.exit(1);
   }
 
-  const content = fs.readFileSync(rcFile, "utf-8");
-  const email = JSON.parse(content).email;
-  return email;
-}
-async function getToken() {
-  const rcFile = path.join(homeDir, '.tncrc');
-  if(!fs.readFileSync(rcFile)){
-    console.log("⚠️ Please login first! ")
-  }
-  const content = fs.readFileSync(rcFile, 'utf-8');
-  const token = JSON.parse(content).token;
-  return token;
-
-
+  return JSON.parse(fs.readFileSync(rcFile, "utf-8"));
 }
 
-// Fetch tasks for a given room
+// -----------------------------
+// Main Function
+// -----------------------------
 async function myTask() {
   try {
-    const email = await getEmail();
-    const token = await getToken();
+    const { email, token } = getAuthData();
+
     const CWD = process.cwd();
-    const metaDataPath = path.join(".tnc", '.tncmeta.json'); // assuming room ID is the current directory name
-    const metaData = JSON.parse(fs.readFileSync(path.join(CWD, metaDataPath), 'utf-8'));
-    const roomId = metaData.roomId;
+    const metaDataPath = path.join(CWD, ".tnc", ".tncmeta.json");
 
-    const res = await axios.get(`${url}/${roomId}`, {
-      params: { email, token } // since backend uses req.query
-    });
-
-    const tasks = res.data.tasks;
-
-    if (!tasks.length) {
-      console.log("📭 No tasks assigned.");
+    if (!fs.existsSync(metaDataPath)) {
+      console.log(chalk.yellow("⚠️ Room metadata not found in current directory!"));
       return;
     }
 
-    console.log("📋 Your Tasks:");
-    tasks.forEach((task, i) => {
-      console.log(`${i + 1}. ${task.title} — ${task.status}`);
+    const metaData = JSON.parse(fs.readFileSync(metaDataPath, "utf-8"));
+    const roomId = metaData.roomId;
+
+    const cacheDir = path.join(CWD, ".tnc");
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
+
+    const cacheFile = path.join(cacheDir, "tasks.json");
+
+    let tasks = [];
+
+    try {
+      const res = await axios.get(`${url}/${roomId}`, {
+        params: {
+          email,
+          token,
+          machineId: machine.machineIdSync()
+        }
+      });
+
+      tasks = res.data.tasks || [];
+
+      fs.writeFileSync(cacheFile, JSON.stringify(tasks, null, 2));
+
+    } catch (error) {
+      if (fs.existsSync(cacheFile)) {
+        console.log(chalk.yellow("⚠️ Offline mode: showing cached tasks"));
+        tasks = JSON.parse(fs.readFileSync(cacheFile, "utf-8"));
+      } else {
+        console.error(
+          chalk.red("❌ Error fetching tasks and no cache available:"),
+          error.response?.data || error.message
+        );
+        return;
+      }
+    }
+
+    if (!tasks.length) {
+      console.log(chalk.gray("📭 No tasks assigned."));
+      return;
+    }
+
+    // -----------------------------
+    // Create Table
+    // -----------------------------
+const table = new CliTable3({
+  head: [
+    chalk.cyan.bold("Title"),
+    chalk.green.bold("Status"),
+    chalk.magenta.bold("Category"),
+    chalk.red.bold("Priority"),
+    chalk.yellow.bold("ID"),
+    chalk.blue.bold("Att.")
+  ],
+  colWidths: [30, 12, 18, 10, 26, 6], // adjusted
+  wordWrap: true,
+  style: {
+    head: [],
+    border: ["grey"]
+  }
+});
+
+
+    console.log(chalk.bold.cyan("\n📋 YOUR TASKS\n"));
+
+    tasks.forEach(task => {
+
+      // Status color
+      let statusColor =
+        task.status === "completed"
+          ? chalk.green
+          : task.status === "in-progress"
+          ? chalk.yellow
+          : chalk.red;
+
+      // Priority color
+      let priorityColor =
+        task.priority === "high"
+          ? chalk.red
+          : task.priority === "medium"
+          ? chalk.yellow
+          : chalk.green;
+
+      table.push([
+        chalk.white(task.title),
+        statusColor(task.status),
+        chalk.magenta(task.category || "General"),
+        priorityColor(task.priority || "low"),
+        chalk.gray(task._id),
+        chalk.blue(task.attachments?.length || 0)
+      ]);
     });
 
+    console.log(table.toString());
+
   } catch (error) {
-    console.error("❌ Error fetching tasks:", error.response?.data || error.message);
+    console.error(chalk.red("❌ Error:"), error.message);
   }
 }
 

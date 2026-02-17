@@ -16,14 +16,30 @@ import sendInvite from '../commands/sendInvite.js'
 import connect from '../commands/connect.js'
 import machine from  "node-machine-id";
 import push from "../commands/push.js";
+import taskCompletion from "../commands/taskCompletion.js";
+import task from "../commands/task.js";
+import createTask from "../commands/createTask.js";
+import myTeam from "../commands/myTeam.js";
 
 
 
 
 const RC_FILE = path.join(os.homedir(), ".tncrc");
 const VERSION_FILE = path.join(process.cwd(), ".tncversions");
-const BASE_URL = "http://localhost:3001/rooms";
+const BASE_URL = "https://thinkncollab.com/rooms";
 const CWD = process.cwd();
+
+async function DAPP() {
+  try {
+   const res =  await axios.get(`http://localhost:4545/logout`);
+    console.log("✅ Command sent to ThinkNCollab Agent");
+    console.log(res.data.message);
+  } catch (err) {
+    console.error("❌ ThinkNCollab Agent not running");
+    process.exit(1);
+  }
+}
+
 
 /** ------------------ LOGIN ------------------ **/
 async function login() {
@@ -35,7 +51,7 @@ async function login() {
 
   try {
     console.log("🔐 Logging in...");
-    const res = await axios.post("http://localhost:3001/login", {
+    const res = await axios.post("https://thinkncollab.com/login", {
       email: answers.email,
       password: answers.password,
       machineId: await machine.machineIdSync()
@@ -124,13 +140,15 @@ async function main() {
       console.log(" Usage: tnc-cli connect <roomId> ");
       process.exit(1);
     }
-
     const link = args[idx+1];
     await connect(link);
     break;
+  }
 
-    
-
+    case "task-complete": {
+    const idx = args.indexOf("task-complete");
+    await taskCompletion();
+    break;
   }
 
     case "pull": {
@@ -172,6 +190,17 @@ case "my-tasks": {
   await myTask(); 
   break;
 }
+case "create-task": {
+  const roomIdx = args.indexOf("create-task");
+
+
+  await createTask(); 
+  break;
+}
+case "send": {
+  await send(); 
+  break;
+}
 case "invite": {
   const roomIdx = args.indexOf("invite");
   if (roomIdx === -1 || !args[roomIdx + 1]) {
@@ -183,24 +212,43 @@ case "invite": {
   await sendInvite(email); 
   break;
 }
+case "task": {
+  task();
+  break;
+}
+
+case "myteam": {
+  myTeam();
+  break;
+}
+
+case "signout": {
+  await DAPP();
+  break;
+ 
+}
 
     default:
-      console.log("✅ TNC CLI ready!");
+      console.log('================================');
+      console.log(' START REAL SYSTEM SHELL ');
+      console.log('================================ */ ');
+      console.log("✅ ThinkNCollab CLI ready!");
       console.log("Commands:");
-      console.log("  tnc-cli login");
-      console.log("  tnc-cli init");
-      console.log("  tnc-cli push --room <roomId> <path>");
-      console.log("  tnc-cli create"); //creating a branch
-      console.log("  tnc-cli pull --room <roomId>");
-      console.log("  tnc-cli sync branch --room <roomId>");
-      console.log("  tnc-cli merge <roomId>")
-      console.log("  tnc-cli status");
-      console.log("  tnc-cli whoami");
-      console.log("  tnc-cli my-tasks <roomId>");
-      console.log("  tnc-cli logout");
-      console.log("  tnc-cli help");
-      console.log("  tnc-cli version");
-      
+      console.log("  tnc-cli login --> to login");
+      console.log("  tnc-cli init <roomId>  --> to use CLI for a room");
+      // console.log("  tnc-cli push --room <roomId> <path>");
+      console.log("  tnc-cli create  --> to create a branch"); //creating a branch
+      // console.log("  tnc-cli pull --room <roomId>");
+      // console.log("  tnc-cli sync branch --room <roomId>");
+      // console.log("  tnc-cli merge <roomId>")
+      // console.log("  tnc-cli status");
+      console.log("  tnc-cli whoami  --> to know by which Id you are loggedin");
+      console.log("  tnc-cli my-tasks --> to get ur tasks from the room ");
+      console.log("  tnc-cli tasks --> to know thetask details");
+      console.log("  tnc-cli task-complete  --> to change the task status to complete")
+      console.log("  tnc-cli logout  --> to logout");
+      console.log("  tnc-cli help  --> to get help");
+      console.log("  tnc-cli version --> to know the version of the package");
     }
 }
 

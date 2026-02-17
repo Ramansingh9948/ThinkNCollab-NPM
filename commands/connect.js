@@ -3,6 +3,7 @@ import machine from "node-machine-id";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import inquirer from "inquirer";
 
 const tncrcPath = path.join(os.homedir(), ".tncrc");
 
@@ -12,18 +13,18 @@ async function connect(roomId) {
     process.exit(1);
   }
    const answer = await inquirer.prompt([
-      { type: "input", name: "projectName", message: "Enter Branch Name to create a branch:" }
+      { type: "input", name: "BranchName", message: "Enter Branch Name to create a branch:" }
     ]);
 
   const data = fs.readFileSync(tncrcPath, "utf-8");
   const { email, token } = JSON.parse(data);
 
   try {
-    const response = await axios.post(`https://thinkncollab.com/cli/connect/${roomId}`, {
+    const response = await axios.post(`http://localhost:3001/cli/connect/${roomId}`, {
       email: email,
       token: token,
       machineId: await machine.machineIdSync(),
-      branchName: answer.projectName,
+      branchName: answer.BranchName,
     });
     const CWD= process.cwd();
     const tncFolderPath = path.join(CWD, ".tnc");

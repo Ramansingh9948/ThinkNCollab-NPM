@@ -4,16 +4,13 @@ import axios from "axios";
 import os from "os";
 
 const homeDir = os.homedir();
-const url = "http://localhost:3001/cli/invite"; 
-// Get saved email from ~/.tncrc
+const url = "https://thinkncollab.com/cli/invite"; 
 async function getEmail() {
   const rcFile = path.join(homeDir, ".tncrc");
-
   if (!fs.existsSync(rcFile)) {
     console.log(" Please login first!");
     process.exit(1);
   }
-
   const content = fs.readFileSync(rcFile, "utf-8");
   const email = JSON.parse(content).email;
   return email;
@@ -26,8 +23,6 @@ async function getToken() {
   const content = fs.readFileSync(rcFile, 'utf-8');
   const token = JSON.parse(content).token;
   return token;
-
-
 }
 async function sendInvite(inviteeEmail) {
   try {
@@ -38,7 +33,7 @@ async function sendInvite(inviteeEmail) {
     const metaData = JSON.parse(fs.readFileSync(path.join(CWD, metaDataPath), 'utf-8'));
     const roomId = metaData.roomId;
     console.log(email, token, roomId, inviteeEmail);
-const res = await axios({
+ const res = await axios({
   method: 'post',
   url: `${url}/${roomId}`,
   params: {
