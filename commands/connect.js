@@ -20,7 +20,7 @@ async function connect(roomId) {
   const { email, token } = JSON.parse(data);
 
   try {
-    const response = await axios.post(`http://localhost:3001/cli/connect/${roomId}`, {
+    const response = await axios.post(`https://thinkncollab.com/cli/connect/${roomId}`, {
       email: email,
       token: token,
       machineId: await machine.machineIdSync(),
@@ -52,8 +52,8 @@ console.log(response.data);
 
 
 
-    // console.log("✅ Connected to project:", response.data.project.name);
-    // console.log("Members connected:", response.data.project.membersConnected);
+    console.log("✅ Connected to project:", response.data.project.name);
+    console.log("Members connected:", response.data.project.membersConnected);
 
   } catch (err) {
     if (err.response) {

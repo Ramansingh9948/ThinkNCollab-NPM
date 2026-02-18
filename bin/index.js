@@ -29,16 +29,7 @@ const VERSION_FILE = path.join(process.cwd(), ".tncversions");
 const BASE_URL = "https://thinkncollab.com/rooms";
 const CWD = process.cwd();
 
-async function DAPP() {
-  try {
-   const res =  await axios.get(`http://localhost:4545/logout`);
-    console.log("✅ Command sent to ThinkNCollab Agent");
-    console.log(res.data.message);
-  } catch (err) {
-    console.error("❌ ThinkNCollab Agent not running");
-    process.exit(1);
-  }
-}
+
 
 
 /** ------------------ LOGIN ------------------ **/
@@ -228,28 +219,53 @@ case "signout": {
  
 }
 
-    default:
-      console.log('================================');
-      console.log(' START REAL SYSTEM SHELL ');
-      console.log('================================ */ ');
-      console.log("✅ ThinkNCollab CLI ready!");
-      console.log("Commands:");
-      console.log("  tnc-cli login --> to login");
-      console.log("  tnc-cli init <roomId>  --> to use CLI for a room");
-      // console.log("  tnc-cli push --room <roomId> <path>");
-      console.log("  tnc-cli create  --> to create a branch"); //creating a branch
-      // console.log("  tnc-cli pull --room <roomId>");
-      // console.log("  tnc-cli sync branch --room <roomId>");
-      // console.log("  tnc-cli merge <roomId>")
-      // console.log("  tnc-cli status");
-      console.log("  tnc-cli whoami  --> to know by which Id you are loggedin");
-      console.log("  tnc-cli my-tasks --> to get ur tasks from the room ");
-      console.log("  tnc-cli tasks --> to know thetask details");
-      console.log("  tnc-cli task-complete  --> to change the task status to complete")
-      console.log("  tnc-cli logout  --> to logout");
-      console.log("  tnc-cli help  --> to get help");
-      console.log("  tnc-cli version --> to know the version of the package");
-    }
+default:
+  console.log("================================");
+  console.log("   THINKNCOLLAB CLI");
+  console.log("================================\n");
+
+  console.log("Authentication:");
+  console.log("  tnc-cli login                     Login to your account");
+  console.log("  tnc-cli logout                    Logout from your account");
+  console.log("  tnc-cli whoami                    Show current logged-in user");
+  console.log("");
+
+  console.log("Project / Room:");
+  console.log("  tnc-cli init <roomId>             Initialize current folder with a room");
+  console.log("  tnc-cli connect <roomId>          Connect project to a room");
+  console.log("  tnc-cli status                    Show project status");
+  console.log("");
+
+  console.log("Branch:");
+  console.log("  tnc-cli create --room <roomId>    Create branch for a room");
+  console.log("");
+
+
+  console.log("Tasks:");
+  console.log("  tnc-cli my-tasks                  Show your assigned tasks");
+  console.log("  tnc-cli create-task               Create a new task");
+  console.log("  tnc-cli task                      View task details");
+  console.log("  tnc-cli task-complete             Mark task as completed");
+  console.log("");
+
+  console.log("Team:");
+  console.log("  tnc-cli myteam                    Show team members");
+  console.log("  tnc-cli invite <email>            Invite member to room");
+  console.log("");
+
+  console.log("Communication:");
+  console.log("  tnc-cli send                      Send message to room");
+  console.log("");
+
+  console.log("Utility:");
+  console.log("  tnc-cli help                      Show help information");
+  console.log("  tnc-cli version                   Show CLI version");
+  console.log("  tnc-cli signout                   Sign out from DAPP");
+  console.log("");
+
+  break;
+}
+
 }
 
 main().catch(err => console.error(err));
