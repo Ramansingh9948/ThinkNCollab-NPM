@@ -175,10 +175,16 @@ async function main() {
       break;
 
 case "my-tasks": {
-  const roomIdx = args.indexOf("my-tasks");
-  const roomId = args[roomIdx + 1]; 
-
-  await myTask(); 
+  const n = args.indexOf("-n");
+  let limit = 5;
+  if (n !== -1 && args[n + 1]) {
+    limit = parseInt(args[n + 1], 10);
+    if (isNaN(limit) || limit <= 0) {
+      console.log("⚠️ Invalid number for -n. Using default of 5.");
+      limit = 5;
+    }
+  }
+  await myTask(limit); 
   break;
 }
 case "create-task": {
@@ -236,9 +242,6 @@ default:
   console.log("  tnc-cli status                    Show project status");
   console.log("");
 
-  console.log("Branch:");
-  console.log("  tnc-cli create --room <roomId>    Create branch for a room");
-  console.log("");
 
 
   console.log("Tasks:");
@@ -248,14 +251,15 @@ default:
   console.log("  tnc-cli task-complete             Mark task as completed");
   console.log("");
 
+  
   console.log("Team:");
   console.log("  tnc-cli myteam                    Show team members");
   console.log("  tnc-cli invite <email>            Invite member to room");
   console.log("");
 
-  console.log("Communication:");
-  console.log("  tnc-cli send                      Send message to room");
-  console.log("");
+  // console.log("Communication:");
+  // console.log("  tnc-cli send                      Send message to room");
+  // console.log("");
 
   console.log("Utility:");
   console.log("  tnc-cli help                      Show help information");
