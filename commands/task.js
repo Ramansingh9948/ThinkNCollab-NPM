@@ -7,7 +7,7 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 
 const CWD = process.cwd();
-const BASE_URL = "https://thinkncollab.com/cli";
+const BASE_URL = "https://thinkncollab.cm/cli";
 const tncrcPath = path.join(os.homedir(), ".tncrc");
 const tncMetaPath = path.join(CWD, ".tnc", ".tncmeta.json");
 const taskFilePath = path.join(CWD, ".tnc", "tasks.json");
@@ -158,7 +158,7 @@ async function task() {
                 printField("Assigned To", `${task.assignedTo.length} user(s)`, chalk.blue.bold, chalk.white);
                 task.assignedTo.forEach((user, index) => {
                     console.log(
-                        chalk.gray(`                 ${index + 1}. ${user.name || user.email || user}`)
+                        chalk.gray(`                 ${index + 1}. ${ user.userId.name} ,  ${(user.userId.email)} [Status: ${user.status}]`)
                     );
                 });
             }

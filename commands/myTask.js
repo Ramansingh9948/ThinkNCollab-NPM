@@ -7,7 +7,7 @@ import CliTable3 from "cli-table3";
 import chalk from "chalk";
 
 const homeDir = os.homedir();
-const url = "http://localhost:3001/cli/mytasks";
+const url = "https://thinkncollab.com/cli/mytasks";
 
 // -----------------------------
 // Read ~/.tncrc
