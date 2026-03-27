@@ -1,7 +1,7 @@
 {
   "name": "thinkncollab-cli",
   "author": "Raman Singh",
-  "version": "0.0.90",
+  "version": "0.0.91",
   "description": "CLI tool for ThinkNCollab",
   "main": "index.js",
   "bin": {

@@ -9,7 +9,7 @@ import http from 'http';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CWD = process.cwd();
-const BASE_URL = "https://thinkncollab.com/cli";
+const BASE_URL = "http://localhost:3001/cli";
 
 async function createTask() {
     try {

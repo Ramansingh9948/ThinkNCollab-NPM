@@ -9,9 +9,9 @@ import chalk from "chalk";
 const homeDir = os.homedir();
 const url = "https://thinkncollab.com/cli/mytasks";
 
-// -----------------------------
+//-----------------------------
 // Read ~/.tncrc
-// -----------------------------
+//-----------------------------
 function getAuthData() {
   const rcFile = path.join(homeDir, ".tncrc");
 

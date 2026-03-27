@@ -7,7 +7,7 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 
 const CWD = process.cwd();
-const BASE_URL = "https://thinkncollab.cm/cli";
+const BASE_URL = "https://thinkncollab.com/cli";
 const tncrcPath = path.join(os.homedir(), ".tncrc");
 const tncMetaPath = path.join(CWD, ".tnc", ".tncmeta.json");
 const taskFilePath = path.join(CWD, ".tnc", "tasks.json");
