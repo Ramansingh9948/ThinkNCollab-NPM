@@ -9,7 +9,7 @@ const CWD = process.cwd();
 const BASE_URL = "https://thinkncollab.com/cli"; // Use your actual base URL
 const tncrcPath = path.join(os.homedir(), '.tncrc');
 const tncMetaPath = path.join(CWD, '.tnc', '.tncmeta.json');
-
+     
 async function taskCompletion() {
   try {
     // Check login status
